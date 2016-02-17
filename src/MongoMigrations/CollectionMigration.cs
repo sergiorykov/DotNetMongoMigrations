@@ -1,3 +1,4 @@
+using System.Linq;
 using MongoDB.Driver.Linq;
 
 namespace MongoMigrations
@@ -16,7 +17,7 @@ namespace MongoMigrations
             CollectionName = collectionName;
         }
 
-        public virtual IMongoQueryable Filter()
+        public virtual IMongoQueryable<BsonDocument> Filter()
         {
             return null;
         }
@@ -66,8 +67,12 @@ namespace MongoMigrations
 
         protected virtual IEnumerable<BsonDocument> GetDocuments(IMongoCollection<BsonDocument> collection)
         {
-            // var query = Filter();
-            // TODO query not supported
+            var query = Filter();
+            if (query != null)
+            {
+                return query.ToList();
+            }
+
             return collection.Find(Builders<BsonDocument>.Filter.Empty).ToList();
         }
     }
